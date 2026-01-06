@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#0a0e17" />
+  <title>Плäнер — полный доступ</title>
+
+  <style>
+    :root{
+      --bg:#0a0e17;
+      --panel:#2a1926;
+      --panel2:#311b2d;
+      --accent:#3f243a;
+      --accent2:#56304f;
+      --mint:#48cae4;
+      --text:#ffffff;
+
+      --muted:rgba(255,255,255,.78);
+      --muted2:rgba(255,255,255,.55);
+      --border:rgba(255,255,255,.92);
+      --border2:rgba(255,255,255,.35);
+
+      --shadow:4px 4px 0 #000;
+      --shadowSoft:2px 2px 0 rgba(0,0,0,.85);
+
+      --r:2px;
+      --container:1120px;
+      --headerH:70px;
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family:"Courier New", monospace;
+      image-rendering:pixelated;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    /* ===== Background (no space) ===== */
+    .bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 25%, rgba(72,202,228,.14), transparent 46%),
+        radial-gradient(circle at 78% 70%, rgba(255,140,200,.10), transparent 50%),
+        linear-gradient(120deg, rgba(72,202,228,.08), transparent 45%),
+        linear-gradient(300deg, rgba(255,140,200,.07), transparent 55%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.030) 0, rgba(255,255,255,.030) 1px, transparent 1px, transparent 22px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.028) 0, rgba(255,255,255,.028) 1px, transparent 1px, transparent 22px);
+      animation:bgMove 16s linear infinite;
+      opacity:.95;
+    }
+    @keyframes bgMove{
+      0%{background-position:0 0,0 0,0 0,0 0,0 0,0 0}
+      100%{background-position:0 0,0 0,220px 0,-220px 0,0 220px,220px 0}
+    }
+
+    /* scanlines */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.03),
+        rgba(255,255,255,.03) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      opacity:.55;
+      z-index:1;
+    }
+
+    /* vignette */
+    body::after{
+      content:"";
+      position:fixed;
+      inset:-30%;
+      pointer-events:none;
+      background:radial-gradient(closest-side, rgba(0,0,0,0), rgba(0,0,0,.72));
+      z-index:1;
+    }
+
+    /* floating tiles */
+    #floaters{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      overflow:hidden;
+      opacity:.85;
+    }
+    .tile{
+      position:absolute;
+      width:var(--s);
+      height:var(--s);
+      border:2px solid rgba(72,202,228,.28);
+      background:rgba(72,202,228,.07);
+      box-shadow:2px 2px 0 rgba(0,0,0,.7);
+      border-radius:2px;
+      animation:floatUp var(--d) linear infinite;
+    }
+    .tile.pink{
+      border-color:rgba(255,140,200,.22);
+      background:rgba(255,140,200,.06);
+    }
+    @keyframes floatUp{
+      0%{transform:translateY(18px);opacity:0}
+      10%{opacity:1}
+      90%{opacity:1}
+      100%{transform:translateY(-120px);opacity:0}
+    }
+
+    .wrap{position:relative;z-index:2;min-height:100%}
+    .container{max-width:var(--container);margin:0 auto;padding:0 16px}
+
+    /* ===== Header ===== */
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      height:var(--headerH);
+      display:flex;
+      align-items:center;
+      background:rgba(10,14,23,.78);
+      backdrop-filter:blur(6px);
+      border-bottom:2px solid var(--border2);
+    }
+    .nav{
+      height:var(--headerH);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:260px;
+    }
+    .logo{
+      width:42px;
+      height:42px;
+      border:3px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      overflow:hidden;
+      background:rgba(49,27,45,.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:16px;
+      letter-spacing:1px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .priceTag{
+      font-size:11px;
+      padding:6px 8px;
+      border:2px solid rgba(72,202,228,.85);
+      color:rgba(72,202,228,.95);
+      background:rgba(72,202,228,.10);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      white-space:nowrap;
+    }
+    .brand .tag{
+      display:block;
+      margin-top:2px;
+      font-size:12px;
+      color:var(--muted2);
+    }
+
+    nav.links{display:none;gap:10px;align-items:center}
+    nav.links a{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:13px;
+      padding:8px 10px;
+      border-radius:var(--r);
+      border:2px solid transparent;
+    }
+    nav.links a:hover{
+      color:var(--text);
+      border-color:var(--border2);
+      background:rgba(49,27,45,.55);
+    }
+
+    .navRight{display:flex;align-items:center;gap:10px}
+
+    .btn{
+      border:3px solid var(--border);
+      background:var(--panel2);
+      color:var(--text);
+      padding:10px 12px;
+      font-size:13px;
+      font-weight:bold;
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:6px 6px 0 #000}
+    .btn:active{transform:translateY(2px);box-shadow:2px 2px 0 #000}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .btn.ghost{
+      background:rgba(10,14,23,.35);
+      border-color:var(--border2);
+      box-shadow:var(--shadowSoft);
+    }
+
+    .burger{
+      display:inline-flex;
+      width:46px;
+      height:46px;
+      align-items:center;
+      justify-content:center;
+      border:3px solid var(--border);
+      background:rgba(49,27,45,.55);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      cursor:pointer;
+    }
+
+    .mobileMenu{
+      display:none;
+      background:rgba(10,14,23,.86);
+      border-top:2px dashed var(--border2);
+      padding:10px 0 14px;
+    }
+    .mobileMenu .row{display:grid;gap:8px}
+    .mobileMenu a{
+      color:var(--muted);
+      text-decoration:none;
+      border:2px solid var(--border2);
+      background:rgba(49,27,45,.55);
+      padding:10px;
+      border-radius:var(--r);
+    }
+    .mobileMenu a:hover{color:var(--text);border-color:var(--border)}
+
+    @media(min-width:980px){
+      nav.links{display:flex}
+      .burger{display:none}
+    }
+
+    section{padding:22px 0}
+    .hero{padding:42px 0 18px}
+    .heroGrid{display:grid;gap:16px;align-items:stretch}
+    @media(min-width:980px){
+      .heroGrid{grid-template-columns:1.12fr .88fr}
+    }
+
+    .card{
+      background:rgba(42,25,38,.74);
+      border:3px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card.soft{
+      background:rgba(49,27,45,.62);
+      box-shadow:var(--shadowSoft);
+    }
+
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      font-size:12px;
+      padding:6px 10px;
+      border:2px solid rgba(72,202,228,.85);
+      color:rgba(72,202,228,.95);
+      background:rgba(72,202,228,.10);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      margin-bottom:10px;
+    }
+
+    .title{
+      margin:0 0 10px;
+      font-size:28px;
+      line-height:1.15;
+      letter-spacing:.5px;
+      text-shadow:2px 2px 0 #000;
+    }
+    .subtitle{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.68;
+    }
+
+    .heroActions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+    .ticker{
+      margin-top:12px;
+      border-top:2px dashed var(--border2);
+      padding-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border:2px solid var(--border2);
+      background:rgba(10,14,23,.35);
+      border-radius:var(--r);
+      color:var(--muted);
+      font-size:12px;
+      box-shadow:var(--shadowSoft);
+    }
+    .pill strong{color:var(--text)}
+
+    /* glitch headline */
+    .glitch{position:relative;display:inline-block}
+    .glitch::before,.glitch::after{
+      content:attr(data-text);
+      position:absolute;left:0;top:0;opacity:.65;pointer-events:none
+    }
+    .glitch::before{
+      transform:translate(2px,0);
+      color:rgba(72,202,228,.9);
+      animation:glitch 3.1s infinite linear alternate-reverse;
+    }
+    .glitch::after{
+      transform:translate(-2px,0);
+      color:rgba(255,140,200,.8);
+      animation:glitch 2.6s infinite linear alternate-reverse;
+    }
+    @keyframes glitch{
+      0%{clip-path:inset(0 0 92% 0)}
+      12%{clip-path:inset(18% 0 55% 0)}
+      24%{clip-path:inset(78% 0 6% 0)}
+      36%{clip-path:inset(12% 0 70% 0)}
+      48%{clip-path:inset(55% 0 25% 0)}
+      60%{clip-path:inset(5% 0 84% 0)}
+      72%{clip-path:inset(40% 0 40% 0)}
+      84%{clip-path:inset(70% 0 16% 0)}
+      100%{clip-path:inset(45% 0 35% 0)}
+    }
+
+    /* mock */
+    .mock{min-height:320px;display:grid;gap:12px}
+    .mockTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .chip{
+      border:2px solid var(--border2);
+      background:rgba(10,14,23,.35);
+      border-radius:var(--r);
+      padding:8px 10px;
+      font-size:12px;
+      color:var(--muted);
+      box-shadow:var(--shadowSoft);
+    }
+    .mockBoard{
+      border:3px solid var(--border);
+      background:rgba(10,14,23,.35);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:12px;
+      position:relative;
+      overflow:hidden;
+      min-height:250px;
+    }
+    .mockBoard::before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(72,202,228,.16), transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(255,140,200,.10), transparent 45%);
+      animation:floatGlow 6.5s ease-in-out infinite;
+      opacity:.95;
+    }
+    @keyframes floatGlow{
+      0%,100%{transform:translate(0,0)}
+      50%{transform:translate(12px,-10px)}
+    }
+    .mockCols{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;z-index:1}
+    .mockCol{
+      border:2px solid var(--border2);
+      background:rgba(49,27,45,.55);
+      border-radius:var(--r);
+      padding:10px;
+      box-shadow:var(--shadowSoft);
+    }
+    .mockCol h4{
+      margin:0 0 8px;
+      font-size:12px;
+      border-bottom:2px dashed var(--border2);
+      padding-bottom:6px;
+      color:rgba(255,255,255,.92);
+    }
+    .taskBar{
+      height:10px;margin:8px 0;border-radius:var(--r);
+      background:linear-gradient(90deg, rgba(72,202,228,.25), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.18);
+      position:relative;overflow:hidden;
+    }
+    .taskBar::after{
+      content:"";
+      position:absolute;left:-30%;top:0;width:30%;height:100%;
+      background:rgba(255,255,255,.10);
+      animation:shimmer 2.9s linear infinite;
+    }
+    @keyframes shimmer{0%{transform:translateX(0)}100%{transform:translateX(350%)}}
+    .mockRow{position:relative;z-index:1;display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .stat{
+      flex:1;min-width:140px;
+      border:2px solid rgba(72,202,228,.6);
+      background:rgba(72,202,228,.10);
+      border-radius:var(--r);
+      padding:10px;
+      box-shadow:var(--shadowSoft);
+    }
+    .stat .k{font-size:18px;font-weight:bold;color:rgba(72,202,228,.95);text-shadow:2px 2px 0 #000}
+    .stat .l{margin-top:4px;font-size:12px;color:var(--muted);line-height:1.4}
+
+    .sectionTitle{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .sectionTitle h2{margin:0;font-size:18px;letter-spacing:1px;text-shadow:2px 2px 0 #000}
+    .sectionTitle p{margin:0;font-size:12px;color:var(--muted2)}
+
+    .grid3{display:grid;gap:14px}
+    @media(min-width:980px){.grid3{grid-template-columns:repeat(3,1fr)}}
+
+    .feature{
+      padding:14px;
+      background:rgba(49,27,45,.60);
+      border:3px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      overflow:hidden;
+    }
+    .feature:hover{transform:translateY(-2px);box-shadow:6px 6px 0 #000}
+    .feature .icon{
+      width:42px;height:42px;
+      border:3px solid rgba(72,202,228,.85);
+      background:rgba(72,202,228,.10);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;margin-bottom:10px;
+    }
+    .feature h3{margin:0 0 8px;font-size:14px}
+    .feature p{margin:0;font-size:12px;color:var(--muted);line-height:1.65}
+
+    .steps{display:grid;gap:14px}
+    @media(min-width:980px){.steps{grid-template-columns:1fr 1fr}}
+    .step{
+      display:flex;gap:12px;align-items:flex-start;
+      border:3px solid var(--border);
+      background:rgba(42,25,38,.78);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      padding:14px;
+    }
+    .step .n{
+      width:44px;min-width:44px;height:44px;
+      border:3px solid var(--border);
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:bold;
+    }
+    .step h3{margin:0 0 6px;font-size:14px}
+    .step p{margin:0;font-size:12px;color:var(--muted);line-height:1.65}
+
+    /* Single plan */
+    .priceCard{
+      border:3px solid rgba(72,202,228,.92);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:16px;
+      background:rgba(72,202,228,.10);
+      max-width:720px;
+      margin:0 auto;
+      overflow:hidden;
+    }
+    .priceCard .top{
+      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px
+    }
+    .stamp{
+      font-size:11px;
+      padding:6px 8px;
+      border:2px solid rgba(72,202,228,.85);
+      color:rgba(72,202,228,.95);
+      background:rgba(72,202,228,.12);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      white-space:nowrap;
+    }
+    .price{
+      margin:6px 0 10px;
+      font-size:26px;
+      font-weight:bold;
+      text-shadow:2px 2px 0 #000;
+    }
+    .price small{font-size:12px;font-weight:normal;color:var(--muted2)}
+    .ul{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:8px}
+    .ul li{display:flex;gap:10px;align-items:flex-start;color:rgba(255,255,255,.84);font-size:12px;line-height:1.6}
+    .ul li .ok{color:rgba(72,202,228,.95);font-weight:bold;text-shadow:2px 2px 0 #000;min-width:18px;text-align:center}
+    .risk{
+      margin-top:10px;border-top:2px dashed var(--border2);padding-top:10px;
+      color:var(--muted2);font-size:12px;line-height:1.65;
+    }
+
+    /* FAQ */
+    .faq{display:grid;gap:10px}
+    .faqItem{
+      border:3px solid var(--border);
+      border-radius:var(--r);
+      background:rgba(42,25,38,.78);
+      box-shadow:var(--shadowSoft);
+      overflow:hidden;
+    }
+    .faqQ{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px;cursor:pointer;user-select:none}
+    .faqQ strong{font-size:13px}
+    .faqQ span{
+      border:2px solid rgba(72,202,228,.75);
+      color:rgba(72,202,228,.95);
+      background:rgba(72,202,228,.10);
+      padding:4px 8px;
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      min-width:34px;
+      text-align:center;
+    }
+    .faqA{
+      max-height:0;overflow:hidden;transition:max-height 320ms ease;
+      border-top:2px dashed var(--border2);
+      background:rgba(10,14,23,.25);
+    }
+    .faqA div{padding:12px 14px;color:var(--muted);font-size:12px;line-height:1.75}
+    .faqItem.open .faqA{max-height:420px}
+
+    /* CTA */
+    .ctaCard{
+      border:3px solid rgba(72,202,228,.85);
+      background:rgba(72,202,228,.10);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .ctaCard::before{
+      content:"";
+      position:absolute;
+      inset:-80px;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(72,202,228,.22), transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(255,140,200,.16), transparent 55%);
+      animation:floatGlow 7s ease-in-out infinite;
+      opacity:.95;
+    }
+    .ctaInner{position:relative;z-index:1;display:grid;gap:12px;align-items:center}
+    @media(min-width:980px){.ctaInner{grid-template-columns:1.1fr .9fr}}
+    .ctaInner h2{margin:0 0 8px;font-size:18px;text-shadow:2px 2px 0 #000}
+    .ctaInner p{margin:0;font-size:13px;color:var(--muted);line-height:1.75}
+    .ctaRight{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
+    @media(min-width:980px){.ctaRight{justify-content:flex-end}}
+
+    footer{
+      border-top:2px solid var(--border2);
+      padding:18px 0 26px;
+      color:var(--muted2);
+      font-size:12px;
+    }
+    .footRow{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+    .tinyLinks{display:flex;gap:10px;flex-wrap:wrap}
+    .tinyLinks a{color:var(--muted2);text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.25)}
+    .tinyLinks a:hover{color:var(--text);border-bottom-color:rgba(72,202,228,.65)}
+
+    /* reveal */
+    .reveal{
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity 520ms ease, transform 520ms ease;
+      will-change:opacity,transform;
+    }
+    .reveal.on{opacity:1;transform:translateY(0)}
+
+    /* modal */
+    .modalOverlay{
+      position:fixed;inset:0;
+      background:rgba(0,0,0,.65);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:999;
+      backdrop-filter:blur(2px);
+    }
+    .modalOverlay.open{display:flex}
+    .modal{
+      width:min(540px,92vw);
+      border:4px solid var(--border);
+      background:rgba(49,27,45,.92);
+      border-radius:var(--r);
+      box-shadow:10px 10px 0 rgba(0,0,0,.7);
+      padding:14px;
+    }
+    .modal h3{
+      margin:0 0 10px;
+      font-size:14px;
+      border-bottom:2px dashed var(--border2);
+      padding-bottom:10px;
+    }
+    .modal p{margin:0 0 12px;color:var(--muted);font-size:12px;line-height:1.7}
+    .field{display:grid;gap:8px;margin-bottom:12px}
+    .field label{font-size:12px;color:var(--muted2)}
+    .input{
+      width:100%;
+      height:42px;
+      border:3px solid var(--border);
+      background:rgba(10,14,23,.5);
+      color:var(--text);
+      border-radius:var(--r);
+      padding:0 10px;
+      box-shadow:var(--shadowSoft);
+      outline:none;
+      font-size:14px;
+    }
+    .input:focus{
+      border-color:rgba(72,202,228,.95);
+      box-shadow:0 0 0 3px rgba(72,202,228,.18), var(--shadowSoft);
+    }
+    .modalActions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:10px}
+    .hint{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:2px dashed var(--border2);
+      font-size:11px;
+      color:var(--muted2);
+      line-height:1.6;
+    }
+
+    /* toast */
+    .toast{
+      position:fixed;
+      bottom:18px;
+      left:50%;
+      transform:translateX(-50%) translateY(10px);
+      background:rgba(49,27,45,.92);
+      border:3px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:10px 12px;
+      color:var(--text);
+      font-size:12px;
+      opacity:0;
+      pointer-events:none;
+      z-index:999;
+      transition:opacity 220ms ease, transform 220ms ease;
+      max-width:min(720px,92vw);
+      text-align:center;
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div id="floaters" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="container nav">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <!-- Положи planer.jpg рядом с index.html -->
+            <img src="./planer.jpg" alt="Плäнер" />
+          </div>
+          <div>
+            <h1>Плäнер <span class="priceTag">990 ₽</span></h1>
+            <span class="tag">Доступ по индивидуальной ссылке</span>
+          </div>
+        </div>
+
+        <nav class="links" aria-label="Навигация">
+          <a href="#features">Функции</a>
+          <a href="#how">Как это работает</a>
+          <a href="#pricing">Купить</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="navRight">
+          <a class="btn ghost" href="#pricing">Купить</a>
+          <a class="btn primary" href="#" id="openPayTop">🧾 Оплатить</a>
+          <button class="burger" id="burger" aria-label="Открыть меню">≡</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mobileMenu" id="mobileMenu">
+      <div class="container">
+        <div class="row">
+          <a href="#features">Функции</a>
+          <a href="#how">Как это работает</a>
+          <a href="#pricing">Купить</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container heroGrid">
+        <div class="card reveal">
+          <div class="badge">🎯 Фокус на неделю • ✅ задачи • 🏆 привычки • 📈 прогресс</div>
+
+          <h2 class="title">
+            <span class="glitch" data-text="Преврати жизнь в игру — и начни закрывать цели каждый день.">
+              Преврати жизнь в игру — и начни закрывать цели каждый день.
+            </span>
+          </h2>
+
+          <p class="subtitle">
+            Плäнер помогает держать ритм без хаоса: задачи по дням, привычки, заметки и итоги недели.
+            В конце недели ты видишь результат — не “ощущение”, а реальный прогресс. 📌
+          </p>
+
+          <div class="heroActions">
+            <a class="btn primary" href="#" id="openPayHero">🧾 Купить за 990 ₽</a>
+            <a class="btn ghost" href="#features">⚙️ Посмотреть функции</a>
+            <a class="btn ghost" href="#faq">❔ Вопросы</a>
+          </div>
+
+          <div class="ticker">
+            <div class="pill"><strong>Автосохранение</strong> прогресса</div>
+            <div class="pill"><strong>Структура</strong> по дням недели</div>
+            <div class="pill"><strong>Удобно</strong> на ПК и телефоне</div>
+            <div class="pill"><strong>Итоги</strong> и показатели</div>
+          </div>
+
+          <p style="margin:12px 0 0;color:var(--muted2);font-size:12px;line-height:1.65;">
+            После оплаты вы получите <b>индивидуальную ссылку</b>, которой нет в открытом доступе.
+          </p>
+        </div>
+
+        <div class="card soft reveal">
+          <div class="mock">
+            <div class="mockTop">
+              <div class="chip">Неделя</div>
+              <div class="chip">Задачи</div>
+              <div class="chip">Статистика</div>
+            </div>
+
+            <div class="mockBoard" aria-label="Превью">
+              <div class="mockCols">
+                <div class="mockCol">
+                  <h4>Понедельник</h4>
+                  <div class="taskBar"></div>
+                  <div class="taskBar"></div>
+                  <div class="taskBar"></div>
+                  <div class="taskBar" style="opacity:.6"></div>
+                </div>
+                <div class="mockCol">
+                  <h4>Среда</h4>
+                  <div class="taskBar"></div>
+                  <div class="taskBar"></div>
+                  <div class="taskBar" style="opacity:.7"></div>
+                  <div class="taskBar" style="opacity:.55"></div>
+                </div>
+                <div class="mockCol">
+                  <h4>Суббота</h4>
+                  <div class="taskBar"></div>
+                  <div class="taskBar" style="opacity:.75"></div>
+                  <div class="taskBar" style="opacity:.65"></div>
+                  <div class="taskBar" style="opacity:.5"></div>
+                </div>
+              </div>
+
+              <div class="mockRow">
+                <div class="stat">
+                  <div class="k" data-counter="87">0</div>
+                  <div class="l">прогресс недели, %</div>
+                </div>
+                <div class="stat">
+                  <div class="k" data-counter="14">0</div>
+                  <div class="l">задач закрыто</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chip">Открываешь — делаешь — видишь результат 🥇</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+      <div class="container">
+        <div class="sectionTitle">
+          <h2>Функции</h2>
+          <p>всё, что нужно в одном месте</p>
+        </div>
+
+        <div class="grid3">
+          <div class="feature reveal">
+            <div class="icon">✅</div>
+            <h3>Задачи по дням</h3>
+            <p>Список задач на каждый день недели. Отмечай выполненное и контролируй прогресс.</p>
+          </div>
+
+          <div class="feature reveal">
+            <div class="icon">🏆</div>
+            <h3>Привычки</h3>
+            <p>Трекер привычек на неделю: быстро отмечай и держи ритм без перегруза.</p>
+          </div>
+
+          <div class="feature reveal">
+            <div class="icon">📈</div>
+            <h3>Статистика</h3>
+            <p>Итоги недели и показатели — чтобы видеть результат в цифрах.</p>
+          </div>
+
+          <div class="feature reveal">
+            <div class="icon">🧠</div>
+            <h3>Заметки</h3>
+            <p>Мысли и короткие записи по дням. Всё сохраняется автоматически.</p>
+          </div>
+
+          <div class="feature reveal">
+            <div class="icon">📅</div>
+            <h3>Календарные метки</h3>
+            <p>Отмечай даты, чтобы события и дедлайны всегда были перед глазами.</p>
+          </div>
+
+          <div class="feature reveal">
+            <div class="icon">⚡</div>
+            <h3>Быстрый старт</h3>
+            <p>Открыл — выбрал неделю — добавил задачи. Вся логика предельно ясна.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section id="how">
+      <div class="container">
+        <div class="sectionTitle">
+          <h2>Как это работает</h2>
+          <p>без сложностей</p>
+        </div>
+
+        <div class="steps">
+          <div class="step reveal">
+            <div class="n">1</div>
+            <div>
+              <h3>Оплата</h3>
+              <p>Нажимаешь “Оплатить 990 ₽”, вводишь тг/почту для получения персональной ссылки на планер после оплаты.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="n">2</div>
+            <div>
+              <h3>Индивидуальная ссылка</h3>
+              <p>После оплаты выдаётся личная ссылка, которая не публикуется и не находится в открытом доступе.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="n">3</div>
+            <div>
+              <h3>Доступ с телефона и ПК</h3>
+              <p>Работает в браузере. На телефоне можно добавить на экран “Домой”, с красивой иконкой и полноценной адаптацией под мобильное приложение.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="n">4</div>
+            <div>
+              <h3>Ритм и прогресс</h3>
+              <p>Задачи + привычки + итоги недели. Прогресс виден каждый раз, когда открываешь.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING (ONE) -->
+    <section id="pricing">
+      <div class="container">
+        <div class="sectionTitle">
+          <h2>Полный доступ</h2>
+          <p>разовый платёж — 990 ₽</p>
+        </div>
+
+        <div class="priceCard reveal">
+          <div class="top">
+            <h3>Плäнер — полный доступ</h3>
+            <div class="stamp">990 ₽ • разовый</div>
+          </div>
+
+          <div class="price">990 ₽ <small>• без подписки</small></div>
+
+          <ul class="ul">
+            <li><span class="ok">✓</span> Задачи по дням недели</li>
+            <li><span class="ok">✓</span> Привычки и отметки</li>
+            <li><span class="ok">✓</span> Статистика и итоги недели</li>
+            <li><span class="ok">✓</span> Заметки и календарные метки</li>
+            <li><span class="ok">✓</span> Индивидуальная ссылка после оплаты</li>
+          </ul>
+
+          <a class="btn primary" href="#" id="openPayPricing">🧾 Оплатить 990 ₽</a>
+
+          <div class="risk">
+            Доступ выдаётся по индивидуальной ссылке. Она не находится в открытом доступе.
+            Сохраните чек, после оплаты менеджер свяжется для выдачи доступа на пользование планером.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <div class="sectionTitle">
+          <h2>FAQ</h2>
+          <p>коротко и по делу</p>
+        </div>
+
+        <div class="faq">
+          <div class="faqItem reveal">
+            <div class="faqQ">
+              <strong>Что значит “индивидуальная ссылка”?</strong>
+              <span>+</span>
+            </div>
+            <div class="faqA"><div>
+              После оплаты пользователь получает личную ссылку,
+              которая не публикуется и не доступна случайным посетителям.
+            </div></div>
+          </div>
+
+          <div class="faqItem reveal">
+            <div class="faqQ">
+              <strong>Как именно выдаётся ссылка после оплаты?</strong>
+              <span>+</span>
+            </div>
+            <div class="faqA"><div>
+              Вы вносите в форму перед оплатой свой личный телеграм и почту, затем с вами связывается менеджер для устонавления личности и подтверждения чеком, после чего выдает доступ.
+            </div></div>
+          </div>
+
+          <div class="faqItem reveal">
+            <div class="faqQ">
+              <strong>Работает на телефоне как отдельная иконка?</strong>
+              <span>+</span>
+            </div>
+            <div class="faqA"><div>
+              Да. Открой в браузере и добавь на экран “Домой”.
+            </div></div>
+          </div>
+
+          <div class="faqItem reveal">
+            <div class="faqQ">
+              <strong>Это разовый платёж?</strong>
+              <span>+</span>
+            </div>
+            <div class="faqA"><div>
+              Да, 990 ₽ один раз. Без подписки.
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section>
+      <div class="container">
+        <div class="ctaCard reveal">
+          <div class="ctaInner">
+            <div>
+              <h2>Преврати жизнь в игру — начни с этой недели</h2>
+              <p>Оплати доступ, получи индивидуальную ссылку и выстрой ритм. Прогресс будет перед глазами.</p>
+            </div>
+            <div class="ctaRight">
+              <a class="btn primary" href="#" id="openPayBottom">🧾 Оплатить 990 ₽</a>
+              <a class="btn ghost" href="#features">Функции</a>
+              <a class="btn ghost" href="#faq">FAQ</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footRow">
+        <div>© <span id="year"></span> Плäнер</div>
+        <div class="tinyLinks">
+          <a href="#pricing">Купить</a>
+          <a href="#features">Функции</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal -->
+  <div class="modalOverlay" id="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Оплата доступа — 990 ₽</h3>
+      <p>После оплаты вы получите индивидуальную ссылку, которой нет в открытом доступе.</p>
+
+      <div class="field">
+        <label for="email">Email (куда отправить ссылку, если нужно)</label>
+        <input class="input" id="email" type="email" placeholder="you@mail.com" autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label for="tg">Telegram (опционально)</label>
+        <input class="input" id="tg" type="text" placeholder="@username" autocomplete="off" />
+      </div>
+
+      <div class="modalActions">
+        <button class="btn ghost" id="closeModal">✕ Закрыть</button>
+        <button class="btn primary" id="goPay">🧾 Перейти к оплате</button>
+      </div>
+
+      <div class="hint">
+        В конфиге ниже вставь PAY_URL (ссылка на оплату). Переход на “успех” обычно настраивается в платежной системе.
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* =========================
+      CONFIG
+      PAY_URL — ссылка на оплату (обязательно)
+    ========================= */
+    const PAY_URL = ""; // <-- ВСТАВЬ ССЫЛКУ НА ОПЛАТУ
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Burger menu
+    const burger = document.getElementById("burger");
+    const mobileMenu = document.getElementById("mobileMenu");
+    burger?.addEventListener("click", () => {
+      mobileMenu.style.display = (mobileMenu.style.display === "block") ? "none" : "block";
+    });
+    mobileMenu?.querySelectorAll("a")?.forEach(a => a.addEventListener("click", () => mobileMenu.style.display = "none"));
+
+    // Reveal
+    const reveals = Array.from(document.querySelectorAll(".reveal"));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(ent => { if (ent.isIntersecting) ent.target.classList.add("on"); });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => io.observe(el));
+
+    // Counters
+    const counterEls = Array.from(document.querySelectorAll("[data-counter]"));
+    function runCounter(el){
+      const target = parseInt(el.getAttribute("data-counter"), 10) || 0;
+      const dur = 900 + Math.random() * 450;
+      const t0 = performance.now();
+      const tick = (t) => {
+        const p = Math.min(1, (t - t0) / dur);
+        const e = 1 - (1 - p) * (1 - p);
+        el.textContent = Math.round(target * e);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+    const counterIO = new IntersectionObserver((entries) => {
+      entries.forEach(ent => {
+        if (ent.isIntersecting) {
+          const el = ent.target;
+          if (!el._counted) { el._counted = true; runCounter(el); }
+        }
+      });
+    }, { threshold: 0.35 });
+    counterEls.forEach(el => counterIO.observe(el));
+
+    // FAQ
+    document.querySelectorAll(".faqItem").forEach(item => {
+      const q = item.querySelector(".faqQ");
+      const badge = item.querySelector(".faqQ span");
+      q.addEventListener("click", () => {
+        const open = item.classList.toggle("open");
+        badge.textContent = open ? "—" : "+";
+      });
+    });
+
+    // Modal
+    const modal = document.getElementById("modal");
+    const toast = document.getElementById("toast");
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function openModal(){ modal.classList.add("open"); }
+    function closeModal(){ modal.classList.remove("open"); }
+
+    document.getElementById("closeModal")?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+    ["openPayTop","openPayHero","openPayPricing","openPayBottom"].forEach(id => {
+      document.getElementById(id)?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
+    });
+
+    document.getElementById("goPay")?.addEventListener("click", () => {
+      const email = (document.getElementById("email").value || "").trim();
+      const tg = (document.getElementById("tg").value || "").trim();
+
+      if (!PAY_URL) {
+        closeModal();
+        showToast("Вставь PAY_URL в конфиге — это ссылка на оплату.");
+        return;
+      }
+
+      // Можно передавать метаданные (если платежка это поддерживает)
+      const url = new URL(PAY_URL);
+      url.searchParams.set("product", "planer_full_access");
+      url.searchParams.set("price", "990");
+      if (email) url.searchParams.set("email", email);
+      if (tg) url.searchParams.set("tg", tg);
+
+      window.location.href = url.toString();
+    });
+
+    // Floating tiles generator
+    const floaters = document.getElementById("floaters");
+    function spawnTile(){
+      const el = document.createElement("div");
+      const size = (Math.random() < 0.7) ? 10 : 14;
+      const dur = 8 + Math.random() * 7;
+      const left = Math.random() * 100;
+      const bottom = -20 - Math.random() * 40;
+
+      el.className = "tile" + (Math.random() < 0.25 ? " pink" : "");
+      el.style.setProperty("--s", size + "px");
+      el.style.setProperty("--d", dur + "s");
+      el.style.left = left + "vw";
+      el.style.bottom = bottom + "px";
+      floaters.appendChild(el);
+
+      setTimeout(() => el.remove(), (dur * 1000) + 600);
+    }
+
+    for (let i = 0; i < 18; i++) setTimeout(spawnTile, i * 250);
+    setInterval(() => { if (!document.hidden) spawnTile(); }, 520);
+  </script>
+</body>
+</html>
