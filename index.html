@@ -1077,7 +1077,9 @@
       CONFIG
       PAY_URL — ссылка на оплату (обязательно)
     ========================= */
-    const PAY_URL = ""; // <-- ВСТАВЬ ССЫЛКУ НА ОПЛАТУ
+    const PAY_URL = "https://www.perplexity.ai/search/otkroi-gitkhab-9YC83iUmR1GMx6HXAYmSXA"; // <-- ВСТАВЬ ССЫЛКУ НА ОПЛАТУ (ЮKassa)
+    const FORMSPREE_URL = "https://formspree.io/f/xeeoyjel"; // <-- ВСТАВЬ ССЫЛКУ FORMSPREE вида https://formspree.io/f/XXXXXXX
+
 
     document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -1151,25 +1153,60 @@
       document.getElementById(id)?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
     });
 
-    document.getElementById("goPay")?.addEventListener("click", () => {
-      const email = (document.getElementById("email").value || "").trim();
-      const tg = (document.getElementById("tg").value || "").trim();
+document.getElementById("goPay")?.addEventListener("click", async () => {
+  const email = (document.getElementById("email").value || "").trim();
+  const tg = (document.getElementById("tg").value || "").trim();
 
-      if (!PAY_URL) {
-        closeModal();
-        showToast("Вставь PAY_URL в конфиге — это ссылка на оплату.");
-        return;
-      }
+  // 1) Минимальная валидация (рекомендую сделать email обязательным)
+  if (!email) {
+    showToast("Укажи email — туда можно продублировать доступ при необходимости.");
+    return;
+  }
 
-      // Можно передавать метаданные (если платежка это поддерживает)
-      const url = new URL(PAY_URL);
-      url.searchParams.set("product", "planer_full_access");
-      url.searchParams.set("price", "990");
-      if (email) url.searchParams.set("email", email);
-      if (tg) url.searchParams.set("tg", tg);
+  if (!PAY_URL) {
+    closeModal();
+    showToast("Вставь PAY_URL в конфиге — это ссылка на оплату.");
+    return;
+  }
 
-      window.location.href = url.toString();
+  if (!FORMSPREE_URL) {
+    closeModal();
+    showToast("Вставь FORMSPREE_URL — ссылку формы Formspree.");
+    return;
+  }
+
+  // 2) Отправляем тебе контакты в Formspree (до оплаты)
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        product: "planer_full_access",
+        price_rub: 990,
+        email: email,
+        telegram: tg || "(не указал)",
+        page: location.href,
+        userAgent: navigator.userAgent,
+        createdAt: new Date().toISOString()
+      })
     });
+
+    // если Formspree не принял — не ломаем оплату, но предупреждаем
+    if (!res.ok) {
+      showToast("Не удалось отправить данные. Всё равно можно оплатить — после оплаты напиши в поддержку.");
+    }
+  } catch (e) {
+    showToast("Ошибка отправки данных. Переходим к оплате…");
+  }
+
+  // 3) Редирект на оплату ЮKassa
+  // (Если PAY_URL — уже готовая платежная ссылка, обычно параметры не нужны.)
+  window.location.href = PAY_URL;
+});
+
 
     // Floating tiles generator
     const floaters = document.getElementById("floaters");
@@ -1195,6 +1232,7 @@
   </script>
 </body>
 </html>
+
 
 
 
