@@ -191,6 +191,12 @@
       box-shadow:var(--shadowSoft);
       white-space:nowrap;
     }
+    .priceTag s{
+      opacity:.65;
+      text-decoration-thickness:2px;
+      text-decoration-color:rgba(255,140,200,.85);
+      margin-right:6px;
+    }
     .brand .tag{
       display:block;
       margin-top:2px;
@@ -349,6 +355,128 @@
     }
     .pill strong{color:var(--text)}
 
+    /* ====== Product mini card (hero) ====== */
+    .heroBuy{display:block; margin-top:10px;}
+    
+
+    .productMini{
+      border:3px solid var(--border);
+      background:rgba(49,27,45,.62);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+      max-width: 520px;
+      margin: 12px auto 0;
+    }
+    .productMiniHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:8px;
+      padding-bottom:8px;
+      border-bottom:2px dashed var(--border2);
+    }
+    .productMiniHeader strong{
+      font-size:12px;
+      letter-spacing:.5px;
+      text-shadow:2px 2px 0 #000;
+    }
+    .productMiniPrice{
+      font-size:11px;
+      border:2px solid rgba(255,140,200,.55);
+      background:rgba(255,140,200,.08);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      padding:6px 8px;
+      white-space:nowrap;
+      color:rgba(255,255,255,.92);
+    }
+    .productMiniPrice s{
+      opacity:.6;
+      text-decoration-thickness:2px;
+      text-decoration-color:rgba(255,140,200,.95);
+      margin-right:6px;
+    }
+
+    .carousel{
+      border:3px solid var(--border);
+      background:rgba(10,14,23,.55);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+      height:220px;
+    }
+    @media(max-width:420px){
+      .carousel{height:160px;}
+    }
+    .carousel img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      filter:contrast(1.02) saturate(1.02);
+    }
+
+    .carBtns{
+      position:absolute;
+      inset:auto 8px 8px 8px;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      pointer-events:none;
+    }
+    .carBtn{
+      pointer-events:auto;
+      width:40px;
+      height:34px;
+      border:3px solid var(--border);
+      background:rgba(42,25,38,.82);
+      color:var(--text);
+      border-radius:var(--r);
+      box-shadow:var(--shadowSoft);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      user-select:none;
+    }
+    .carBtn:hover{transform:translateY(-1px)}
+    .carBtn:active{transform:translateY(1px)}
+
+    .carDots{
+      margin-top:8px;
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      justify-content:center;
+      opacity:.95;
+    }
+    .dot{
+      width:10px;
+      height:10px;
+      border:2px solid var(--border2);
+      background:rgba(255,255,255,.08);
+      border-radius:2px;
+      box-shadow:var(--shadowSoft);
+      cursor:pointer;
+    }
+    .dot.on{
+      border-color:rgba(72,202,228,.95);
+      background:rgba(72,202,228,.18);
+    }
+    .productMiniNote{
+      margin-top:8px;
+      font-size:11px;
+      color:var(--muted2);
+      line-height:1.6;
+      text-align:center;
+    }
+
     /* glitch headline */
     .glitch{position:relative;display:inline-block}
     .glitch::before,.glitch::after{
@@ -376,6 +504,7 @@
       84%{clip-path:inset(70% 0 16% 0)}
       100%{clip-path:inset(45% 0 35% 0)}
     }
+
 
     /* mock */
     .mock{min-height:320px;display:grid;gap:12px}
@@ -693,7 +822,59 @@
       text-align:center;
     }
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  </style>
+  
+    /* ===== Preview grid (no slider) ===== */
+    .previewGridWrap{
+      padding:14px 16px 16px;
+      border-top:2px dashed var(--border2);
+      background:rgba(10,14,23,.20);
+    }
+    .previewGrid{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;          /* строго в одну линию */
+  align-items:stretch;
+  justify-content:center;    /* центрируем, когда всё помещается */
+  width:100%;
+  overflow-x:auto;           /* если экран узкий — появится горизонтальный скролл вместо переноса */
+  padding:0 2px 6px;         /* симметричные края + место под скролл */
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+}
+.previewGrid::-webkit-scrollbar{height:8px}
+.previewGrid::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.18);
+  border:2px solid rgba(0,0,0,.25);
+  border-radius:2px;
+}
+.previewGrid::-webkit-scrollbar-track{background:rgba(0,0,0,.15)}
+    .previewShot{
+      margin:0;
+      flex:0 0 clamp(118px, 14vw, 150px);
+      border:3px solid var(--border);
+      background:rgba(10,14,23,.35);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      padding:8px;
+    }
+    .previewShot img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+  
+/* === Center previews in single row === */
+.previewRow, .preview-grid, .previewRowSingle {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap !important;
+}
+
+</style>
 </head>
 
 <body>
@@ -709,7 +890,7 @@
             <img src="./planer.jpg" alt="Плäнер" />
           </div>
           <div>
-            <h1>Плäнер <span class="priceTag">990 ₽</span></h1>
+            <h1>Плäнер <span class="priceTag"><s>990 ₽</s>690 ₽</span></h1>
             
           </div>
         </div>
@@ -756,22 +937,24 @@
             В конце недели ты видишь результат — не “ощущение”, а реальный прогресс. 📌
           </p>
 
-          <div class="heroActions">
-            <a class="btn primary" href="#" id="openPayHero">🧾 Купить за 990 ₽</a>
-            <a class="btn ghost" href="#features">⚙️ Посмотреть функции</a>
-            <a class="btn ghost" href="#faq">❔ Вопросы</a>
-          </div>
+                    <div class="heroBuy">
+              <div class="heroActions">
+                <a class="btn primary" href="#" id="openPayHero">🧾 Купить за 690 ₽</a>
+                <a class="btn ghost" href="#features">⚙️ Посмотреть функции</a>
+                <a class="btn ghost" href="#faq">❔ Вопросы</a>
+              </div>
 
-          <div class="ticker">
-            <div class="pill"><strong>Автосохранение</strong> прогресса</div>
-            <div class="pill"><strong>Структура</strong> по дням недели</div>
-            <div class="pill"><strong>Удобно</strong> на ПК и телефоне</div>
-            <div class="pill"><strong>Итоги</strong> и показатели</div>
-          </div>
+              <div class="ticker">
+                <div class="pill"><strong>Автосохранение</strong> прогресса</div>
+                <div class="pill"><strong>Структура</strong> по дням недели</div>
+                <div class="pill"><strong>Удобно</strong> на ПК и телефоне</div>
+                <div class="pill"><strong>Итоги</strong> и показатели</div>
+              </div>
 
-          <p style="margin:12px 0 0;color:var(--muted2);font-size:12px;line-height:1.65;">
-            После оплаты вы получите <b>индивидуальную ссылку</b>, которой нет в открытом доступе.
-          </p>
+              <p style="margin:12px 0 0;color:var(--muted2);font-size:12px;line-height:1.65;">
+                После оплаты доступ <b>приходит автоматически сразу</b>: на почту и в Telegram (если указали).
+              </p>
+            </div>
         </div>
 
         <div class="card soft reveal">
@@ -820,6 +1003,35 @@
             </div>
 
             <div class="chip">Открываешь — делаешь — видишь результат 🥇</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- PREVIEW -->
+    <section id="preview">
+      <div class="container">
+        <div class="sectionTitle">
+          <h2>Превью интерфейса</h2>
+          <p>вас это ждет</p>
+        </div>
+
+        <div class="card soft reveal" style="padding:0">
+          <div class="productMiniHeader" style="padding:14px 16px;margin:0">
+            <div>
+              <strong style="font-size:13px;letter-spacing:.5px;text-shadow:2px 2px 0 #000">Как выглядит Плäнер внутри</strong>
+</div>
+            <div class="productMiniPrice"><s>990 ₽</s>690 ₽</div>
+          </div>
+
+          <div class="previewGridWrap">
+            <div class="previewGrid" aria-label="Скриншоты интерфейса">
+<figure class="previewShot"><img src="./photo_5465586613241975943_x.jpg" alt="Плäнер — задачи на день" /></figure>
+              <figure class="previewShot"><img src="./photo_5465586613241975942_x.jpg" alt="Плäнер — календарь" /></figure>
+              <figure class="previewShot"><img src="./photo_5465586613241975941_x.jpg" alt="Плäнер — трекер привычек" /></figure>
+              <figure class="previewShot"><img src="./photo_5465586613241975940_x.jpg" alt="Плäнер — список задач" /></figure>
+            </div>
           </div>
         </div>
       </div>
@@ -886,7 +1098,7 @@
             <div class="n">1</div>
             <div>
               <h3>Оплата</h3>
-              <p>Нажимаешь “Оплатить 990 ₽”, вводишь тг/почту для получения персональной ссылки на планер после оплаты.</p>
+              <p>Нажимаешь “Оплатить 690 ₽”, вводишь email и Telegram (опционально) — чтобы сразу получить доступ после оплаты.</p>
             </div>
           </div>
 
@@ -894,7 +1106,7 @@
             <div class="n">2</div>
             <div>
               <h3>Индивидуальная ссылка</h3>
-              <p>После оплаты выдаётся личная ссылка, которая не публикуется и не находится в открытом доступе.</p>
+              <p>Сразу после оплаты доступ автоматически приходит на почту и в Telegram. Ссылка не публикуется и не находится в открытом доступе.</p>
             </div>
           </div>
 
@@ -922,16 +1134,16 @@
       <div class="container">
         <div class="sectionTitle">
           <h2>Полный доступ</h2>
-          <p>разовый платёж — 990 ₽</p>
+          <p>разовый платёж — <s>990 ₽</s> 690 ₽</p>
         </div>
 
         <div class="priceCard reveal">
           <div class="top">
             <h3>Плäнер — полный доступ</h3>
-            <div class="stamp">990 ₽ • разовый</div>
+            <div class="stamp"><s>990 ₽</s> 690 ₽ • разовый</div>
           </div>
 
-          <div class="price">990 ₽ <small>• без подписки</small></div>
+          <div class="price"><s>990 ₽</s> 690 ₽ <small>• без подписки</small></div>
 
           <ul class="ul">
             <li><span class="ok">✓</span> Задачи по дням недели</li>
@@ -941,12 +1153,11 @@
             <li><span class="ok">✓</span> Индивидуальная ссылка после оплаты</li>
           </ul>
 
-          <a class="btn primary" href="#" id="openPayPricing">🧾 Оплатить 990 ₽</a>
+          <a class="btn primary" href="#" id="openPayPricing">🧾 Оплатить 690 ₽</a>
 
           <div class="risk">
-            Доступ выдаётся по индивидуальной ссылке и не находится в открытом доступе.<br><br>
-            <b>После оплаты доступ выдаётся в течение 5–30 минут.</b><br>
-            Если не получили ссылку — напишите на
+            Доступ приходит <b>автоматически сразу после оплаты</b> — на почту и в Telegram (если вы указали @username).<br><br>
+            Если письмо не пришло — проверьте “Спам/Промоакции”. Если всё равно нет — напишите на
             <a href="mailto:planerhelp@proton.me" style="color:inherit;">planerhelp@proton.me</a>.
           </div>
 
@@ -980,7 +1191,7 @@
               <span>+</span>
             </div>
             <div class="faqA"><div>
-              Вы вносите в форму перед оплатой свой личный телеграм и почту, затем с вами связывается менеджер для устонавления личности и подтверждения чеком, после чего выдает доступ.
+              Вы указываете email и Telegram перед оплатой. Сразу после оплаты доступ автоматически приходит на почту и в Telegram.
             </div></div>
           </div>
 
@@ -1000,7 +1211,7 @@
               <span>+</span>
             </div>
             <div class="faqA"><div>
-              Да, 990 ₽ один раз. Без подписки.
+              Да, <s>990 ₽</s> 690 ₽ один раз. Без подписки.
             </div></div>
           </div>
         </div>
@@ -1014,10 +1225,10 @@
           <div class="ctaInner">
             <div>
               <h2>Преврати жизнь в игру — начни с этой недели</h2>
-              <p>Оплати доступ, получи индивидуальную ссылку и выстрой ритм. Прогресс будет перед глазами.</p>
+              <p>Оплати доступ и получи его автоматически сразу (почта + Telegram). Прогресс будет перед глазами.</p>
             </div>
             <div class="ctaRight">
-              <a class="btn primary" href="#" id="openPayBottom">🧾 Оплатить 990 ₽</a>
+              <a class="btn primary" href="#" id="openPayBottom">🧾 Оплатить 690 ₽</a>
               <a class="btn ghost" href="#features">Функции</a>
               <a class="btn ghost" href="#faq">FAQ</a>
             </div>
@@ -1053,11 +1264,10 @@
   <!-- Modal -->
   <div class="modalOverlay" id="modal">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">Оплата доступа — 990 ₽</h3>
+      <h3 id="modalTitle">Оплата доступа — <s>990 ₽</s> 690 ₽</h3>
       <p>
-  После оплаты вы получите индивидуальную ссылку, которой нет в открытом доступе.<br><br>
-  <b>После оплаты доступ выдаётся в течение 5–30 минут.</b><br>
-  Если не получили ссылку — напишите на
+  После оплаты доступ приходит <b>автоматически сразу</b>: на почту и в Telegram (если указали).<br><br>
+  Если письмо не пришло — проверь “Спам/Промоакции”. Если всё равно нет — напиши на
   <a href="mailto:planerhelp@proton.me" style="color:inherit;">planerhelp@proton.me</a>.
 </p>
 
@@ -1092,7 +1302,7 @@
       CONFIG
       PAY_URL — ссылка на оплату (обязательно)
     ========================= */
-    const PAY_URL = "https://yookassa.ru/my/i/aXvJM6opbDyf/l"; // <-- ВСТАВЬ ССЫЛКУ НА ОПЛАТУ (ЮKassa)
+    const PAY_URL = "https://yookassa.ru/my/i/aWH-K5jO5mkT/l"; // <-- ВСТАВЬ ССЫЛКУ НА ОПЛАТУ (ЮKassa)
     const FORMSPREE_URL = "https://formspree.io/f/xeeoyjel"; // <-- ВСТАВЬ ССЫЛКУ FORMSPREE вида https://formspree.io/f/XXXXXXX
 
 
@@ -1200,7 +1410,7 @@ document.getElementById("goPay")?.addEventListener("click", async () => {
       },
       body: JSON.stringify({
         product: "planer_full_access",
-        price_rub: 990,
+        price_rub: 690,
         email: email,
         telegram: tg || "(не указал)",
         page: location.href,
@@ -1221,6 +1431,57 @@ document.getElementById("goPay")?.addEventListener("click", async () => {
   // (Если PAY_URL — уже готовая платежная ссылка, обычно параметры не нужны.)
   window.location.href = PAY_URL;
 });
+
+    // Mini carousel (hero product card)
+    const carImgs = [
+      "", // ноутбук (первый)
+      "./photo_5465586613241975943_x.jpg", // задачи на день (второй)
+      "./photo_5465586613241975940_x.jpg",
+      "./photo_5465586613241975942_x.jpg",
+      "./photo_5465586613241975941_x.jpg"
+    ];
+
+    const carImgEl = document.getElementById("miniCarouselImg");
+    const carDotsEl = document.getElementById("carDots");
+    const carPrev = document.getElementById("carPrev");
+    const carNext = document.getElementById("carNext");
+
+    let carIdx = 0;
+
+    function renderDots(){
+      if (!carDotsEl) return;
+      carDotsEl.innerHTML = "";
+      carImgs.forEach((_, i) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (i === carIdx ? " on" : "");
+        d.setAttribute("role","button");
+        d.setAttribute("tabindex","0");
+        d.setAttribute("aria-label","Скрин " + (i + 1));
+        d.addEventListener("click", () => setCar(i));
+        d.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") setCar(i); });
+        carDotsEl.appendChild(d);
+      });
+    }
+
+    function setCar(i){
+      carIdx = (i + carImgs.length) % carImgs.length;
+      if (carImgEl) carImgEl.src = carImgs[carIdx];
+      Array.from(carDotsEl?.children || []).forEach((el, idx) => {
+        el.classList.toggle("on", idx === carIdx);
+      });
+    }
+
+    carPrev?.addEventListener("click", () => setCar(carIdx - 1));
+    carNext?.addEventListener("click", () => setCar(carIdx + 1));
+
+    // Init
+    if (carImgEl && carDotsEl){
+      carImgEl.src = carImgs[0];
+      renderDots();
+      setCar(0);
+    }
+
+
 
 
     // Floating tiles generator
@@ -1247,8 +1508,6 @@ document.getElementById("goPay")?.addEventListener("click", async () => {
   </script>
 </body>
 </html>
-
-
 
 
 
