@@ -874,6 +874,57 @@
   flex-wrap: nowrap !important;
 }
 
+/* ===== Reviews marquee ===== */
+.reviewsMarquee{
+  margin-top:16px;
+  padding:12px 0;
+  overflow:hidden;
+  border-top:2px dashed var(--border2);
+  border-bottom:2px dashed var(--border2);
+  background:rgba(10,14,23,.25);
+}
+
+.reviewsTrack{
+  width:100%;
+  overflow:hidden;
+}
+
+.reviewsRow{
+  display:flex;
+  gap:14px;
+  width:max-content;
+  animation:reviewsScroll 60s linear infinite;
+}
+
+
+.review{
+  flex:0 0 auto;
+  border:3px solid var(--border);
+  background:rgba(49,27,45,.65);
+  border-radius:var(--r);
+  box-shadow:var(--shadowSoft);
+  padding:10px 14px;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+@keyframes reviewsScroll{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* Надпись над отзывами */
+.reviewsTitle{
+  text-align:center;
+  font-size:11px;
+  color:var(--muted2);
+  margin-top:6px;
+  margin-bottom:6px;
+  letter-spacing:.3px;
+}
+
+
 </style>
 </head>
 
@@ -1036,6 +1087,42 @@
         </div>
       </div>
     </section>
+
+    <div class="reviewsTitle">
+  Спасибо за ваши отзывы! Мы рады, что приносим пользу
+</div>
+
+
+    <!-- REVIEWS MARQUEE -->
+<section class="reviewsMarquee">
+  <div class="reviewsTrack">
+    <div class="reviewsRow">
+      <div class="review">Алина • наконец начала закрывать задачи без тревоги</div>
+      <div class="review">Макс • удобно видеть неделю целиком, реально помогает</div>
+      <div class="review">Илья • перестал держать всё в голове...</div>
+      <div class="review">Кристина • кайф, что есть трекер привычек</div>
+      <div class="review">Никита • стал спокойнее, спасибо</div>
+      <div class="review">Мария • теперь понятно, куда уходит мой день, удобно</div>
+      <div class="review">Артём • зашло, пользуюсь каждый день</div>
+      <div class="review">Полина • красиво и не перегружено, как хотела</div>
+      <div class="review">Денис • реально помогает держать фокус</div>
+      <div class="review">София • лучше, чем обычные эксель таблицы</div>
+
+      <!-- повтор -->
+      <div class="review">Алина • наконец начала закрывать задачи без тревоги</div>
+      <div class="review">Макс • удобно видеть неделю целиком, реально помогает</div>
+      <div class="review">Илья • перестал держать всё в голове...</div>
+      <div class="review">Кристина • кайф, что есть трекер привычек</div>
+      <div class="review">Никита • стал спокойнее, спасибо</div>
+      <div class="review">Мария • теперь понятно, куда уходит мой день, удобно</div>
+      <div class="review">Артём • зашло, пользуюсь каждый день</div>
+      <div class="review">Полина • красиво и не перегружено, как хотела</div>
+      <div class="review">Денис • реально помогает держать фокус</div>
+      <div class="review">София • лучше, чем обычные эксель таблицы</div>
+    </div>
+  </div>
+</section>
+
 
     <!-- FEATURES -->
     <section id="features">
@@ -1266,7 +1353,7 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <h3 id="modalTitle">Оплата доступа — <s>990 ₽</s> 690 ₽</h3>
       <p>
-  После оплаты доступ приходит <b>автоматически сразу</b>: на почту и в Telegram (если указали).<br><br>
+  После оплаты доступ приходит <b>автоматически сразу</b>: на почту и в Telegram.<br><br>
   Если письмо не пришло — проверь “Спам/Промоакции”. Если всё равно нет — напиши на
   <a href="mailto:planerhelp@proton.me" style="color:inherit;">planerhelp@proton.me</a>.
 </p>
@@ -1508,7 +1595,6 @@ document.getElementById("goPay")?.addEventListener("click", async () => {
   </script>
 </body>
 </html>
-
 
 
 
