@@ -1,54 +1,101 @@
 import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, error: "Method not allowed" });
+  // =========================
+  // CORS (чтобы fetch из лендинга работал)
+  // =========================
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://tvoy-planer.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
+
+  // Ответ на preflight-запрос браузера
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
 
-  try {
-    const { to } = req.body || {};
-    if (!to || !String(to).includes("@")) {
-      return res.status(400).json({ ok: false, error: "Provide { to: email }" });
-    }
-
-    const SMTP_HOST = process.env.SMTP_HOST;
-    const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
-    const SMTP_USER = process.env.SMTP_USER;
-    const SMTP_PASS = process.env.SMTP_PASS;
-
-    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-      return res.status(500).json({ ok: false, error: "Missing SMTP env vars" });
-    }
-
-    const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: SMTP_PORT === 465, // 465 true, 587 false
-      auth: { user: SMTP_USER, pass: SMTP_PASS },
+  // Разрешаем только POST
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      ok: false,
+      error: "Method not allowed",
     });
+  }
 
-    const planerLink = "https://planer-eight.vercel.app/";
-    const text =
-`Ваша ссылка на Planer:
-${planerLink}
+  // =========================
+  // Проверка входных данных
+  // =========================
+  const { to } = req.body || {};
 
-Пожалуйста, сохраните её:
-• добавьте на экран «Домой» на телефоне
-• закрепите вкладку в браузере, чтобы Planer всегда был рядом
+  if (!to) {
+    return res.status(400).json({
+      ok: false,
+      error: "Email is required",
+    });
+  }
 
-Спасибо 💖`;
+  // =========================
+  // SMTP-транспорт (reg.ru)
+  // =========================
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: Number(process.env.SMTP_PORT) === 465, // true для 465
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
+  // =========================
+  // Тестовое письмо
+  // =========================
+  try {
     const info = await transporter.sendMail({
-      from: `Planer <${SMTP_USER}>`,
+      from: `"Planer" <${process.env.SMTP_USER}>`,
       to,
       subject: "Тест: письмо Planer ✅",
-      text,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2>Проверка отправки писем</h2>
+
+          <p>Это тестовое письмо от Planer.</p>
+
+          <p><b>Ваша ссылка на Planer:</b></p>
+          <p>
+            <a href="https://planer-eight.vercel.app/" target="_blank">
+              https://planer-eight.vercel.app/
+            </a>
+          </p>
+
+          <p>Рекомендуем:</p>
+          <ul>
+            <li>добавить Planer на экран «Домой» на телефоне</li>
+            <li>закрепить вкладку в браузере</li>
+          </ul>
+
+          <p>Спасибо 💖</p>
+        </div>
+      `,
     });
 
-    console.log("TEST EMAIL SENT:", info.messageId, "to:", to);
-    return res.status(200).json({ ok: true, messageId: info.messageId });
-  } catch (err) {
-    console.error("TEST EMAIL ERROR:", err);
-    return res.status(500).json({ ok: false, error: String(err?.message || err) });
+    return res.status(200).json({
+      ok: true,
+      messageId: info.messageId,
+    });
+  } catch (error) {
+    console.error("Email send error:", error);
+    return res.status(500).json({
+      ok: false,
+      error: "Failed to send email",
+    });
   }
 }
