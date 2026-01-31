@@ -1465,36 +1465,31 @@ document.getElementById("goPay")?.addEventListener("click", async () => {
   const email = (document.getElementById("email").value || "").trim();
 
   if (!email) {
-    showToast("Укажи email — туда сразу придёт доступ.");
+    showToast("Укажи email — туда придёт ссылка на Planer сразу после оплаты.");
     return;
   }
 
   try {
-    // создаём платеж на сервере (Vercel /api)
-    const res = await fetch(CREATE_PAYMENT_ENDPOINT, {
+    const res = await fetch("/api/create-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
 
-    if (!res.ok) {
-      showToast("Не удалось создать оплату. Попробуй ещё раз или напиши в поддержку.");
-      return;
-    }
-
     const data = await res.json();
 
-    if (!data.confirmation_url) {
-      showToast("Ошибка оплаты. Напиши в поддержку: planerhelp@proton.me");
+    if (!res.ok || !data.confirmation_url) {
+      showToast("Не удалось создать оплату. Попробуй ещё раз через минуту.");
       return;
     }
 
-    // редирект на YooKassa checkout
+    // Редирект на оплату ЮKassa
     window.location.href = data.confirmation_url;
   } catch (e) {
-    showToast("Сбой соединения. Попробуй ещё раз.");
+    showToast("Ошибка соединения. Попробуй ещё раз.");
   }
 });
+
 
 
     // Mini carousel (hero product card)
