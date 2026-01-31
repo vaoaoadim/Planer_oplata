@@ -1362,8 +1362,8 @@
  
 
       <div class="field">
-        <label for="tg">email</label>
-        <input class="input" id="tg" type="text" placeholder="Введите почту" autocomplete="off" />
+       <label for="email">email</label>
+       <input class="input" id="email" type="email" placeholder="Введите почту" autocomplete="email" />
       </div>
 
       <div class="modalActions">
@@ -1464,7 +1464,9 @@
 document.getElementById("goPay")?.addEventListener("click", async (e) => {
   e.preventDefault();
 
-  const emailValue = (document.getElementById("email").value || "").trim();
+  const emailEl = document.getElementById("email");
+  const emailValue = (emailEl?.value || "").trim();
+
   if (!emailValue || !emailValue.includes("@")) {
     showToast("Укажи email — без него не получится создать оплату.");
     return;
@@ -1473,7 +1475,7 @@ document.getElementById("goPay")?.addEventListener("click", async (e) => {
   showToast("Создаём оплату…");
 
   try {
-    const response = await fetch("/api/create-payment", {
+    const response = await fetch(CREATE_PAYMENT_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: emailValue })
@@ -1487,13 +1489,13 @@ document.getElementById("goPay")?.addEventListener("click", async (e) => {
       return;
     }
 
-    // Редирект на платёж
     window.location.href = data.confirmation_url;
   } catch (err) {
     console.error("Fetch create-payment failed:", err);
     showToast("Ошибка при соединении с сервером.");
   }
 });
+
 
 
 
