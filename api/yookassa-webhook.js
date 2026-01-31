@@ -10,7 +10,7 @@ function buildEmailHtml(planerLink) {
         <a href="${planerLink}" style="color:#0b57d0; text-decoration:underline;">${planerLink}</a>
       </p>
 
-      <p><b>Сохраните её и сделайте доступ удобным:</b></p>
+      <p><b>Сохраните и сделайте доступ удобным:</b></p>
       <ul style="margin:8px 0 14px; padding-left:18px;">
         <li>добавьте на экран «Домой» на телефоне</li>
         <li>закрепите вкладку в браузере</li>
