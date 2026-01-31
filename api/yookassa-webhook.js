@@ -5,7 +5,7 @@ function buildEmailHtml(planerLink) {
   // Твой текст, красиво пунктами
   return `
     <div style="font-family:Arial, sans-serif; font-size:16px; line-height:1.55;">
-      <p><b>Ваша ссылка на Planer:</b></p>
+      <p><b>Доброго времени суток! Забирайте Planer:</b></p>
       <p style="margin:10px 0;">
         <a href="${planerLink}" style="color:#0b57d0; text-decoration:underline;">${planerLink}</a>
       </p>
@@ -16,7 +16,7 @@ function buildEmailHtml(planerLink) {
         <li>закрепите вкладку в браузере</li>
       </ul>
 
-      <p>Спасибо 💖</p>
+      <p>Желаем Вам успехов на пути к мечте! Спасибо, что выбрали нас 💖</p>
     </div>
   `;
 }
