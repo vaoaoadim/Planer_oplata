@@ -1461,34 +1461,40 @@
       document.getElementById(id)?.addEventListener("click", (e) => { e.preventDefault(); openModal(); });
     });
 
-document.getElementById("goPay")?.addEventListener("click", async () => {
-  const email = (document.getElementById("email").value || "").trim();
+document.getElementById("goPay")?.addEventListener("click", async (e) => {
+  e.preventDefault();
 
-  if (!email) {
-    showToast("Укажи email — туда придёт ссылка на Planer сразу после оплаты.");
+  const emailValue = (document.getElementById("email").value || "").trim();
+  if (!emailValue || !emailValue.includes("@")) {
+    showToast("Укажи email — без него не получится создать оплату.");
     return;
   }
 
+  showToast("Создаём оплату…");
+
   try {
-    const res = await fetch("/api/create-payment", {
+    const response = await fetch("/api/create-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email: emailValue })
     });
 
-    const data = await res.json();
+    const data = await response.json().catch(() => ({}));
 
-    if (!res.ok || !data.confirmation_url) {
-      showToast("Не удалось создать оплату. Попробуй ещё раз через минуту.");
+    if (!response.ok || !data.confirmation_url) {
+      console.error("Ошибка create-payment:", data);
+      showToast("Не удалось создать платёж. Попробуй ещё раз.");
       return;
     }
 
-    // Редирект на оплату ЮKassa
+    // Редирект на платёж
     window.location.href = data.confirmation_url;
-  } catch (e) {
-    showToast("Ошибка соединения. Попробуй ещё раз.");
+  } catch (err) {
+    console.error("Fetch create-payment failed:", err);
+    showToast("Ошибка при соединении с сервером.");
   }
 });
+
 
 
 
