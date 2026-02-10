@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const shopId = process.env.YOOKASSA_SHOP_ID;
     const secretKey = process.env.YOOKASSA_SECRET_KEY;
     const planerLink = process.env.PLANER_LINK;
-    const priceRub = Number(process.env.PRICE_RUB || 690);
+    const priceRub = Number(process.env.PRICE_RUB || 199);
 
     if (!shopId || !secretKey) {
       return res.status(500).json({ error: "YooKassa credentials are not set" });
